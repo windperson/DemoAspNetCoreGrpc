@@ -1,15 +1,24 @@
-﻿using System.Threading.Tasks;
-using Grpc.Net.Client;
+﻿using Grpc.Net.Client;
 using GrpcGreeterClient;
+using Microsoft.Extensions.DependencyInjection;
 
 Console.WriteLine("Press any key to start...");
 Console.ReadKey();
-Console.WriteLine("Connecting to gRPC server...");
-// The port number must match the port of the gRPC server.
-using var channel = GrpcChannel.ForAddress(" https://localhost:7145");
-var client = new Greeter.GreeterClient(channel);
-var reply = await client.SayHelloAsync(
-    new HelloRequest { Name = "GreeterClient" });
+Console.WriteLine("Connecting to gRPC server...\r\n");
+
+// Setup dependency injection
+var serviceCollection = new ServiceCollection();
+serviceCollection.AddGrpcClient<Greeter.GreeterClient>(o =>
+    {
+        o.Address = new Uri("https://localhost:7145");
+    });
+
+var serviceProvider = serviceCollection.BuildServiceProvider();
+
+// Do the actual work
+var client = serviceProvider.GetRequiredService<Greeter.GreeterClient>();
+var reply = await client.SayHelloAsync(new HelloRequest { Name = "GreeterClient" });
+
 Console.WriteLine("Greeting: " + reply.Message);
-Console.WriteLine("Press any key to exit...");
+Console.WriteLine("\r\nPress any key to exit...");
 Console.ReadKey();
