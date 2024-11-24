@@ -1,5 +1,4 @@
-﻿using Grpc.Net.Client;
-using GrpcGreeterClient;
+﻿using GrpcGreeterClient;
 using Microsoft.Extensions.DependencyInjection;
 
 Console.WriteLine("Press any key to start...");
